@@ -1,16 +1,26 @@
 
-const AppDetail = () => {
+const AppDetail = (props) => {
 
 
     return (
         <>
-            {/*TODO: Text box for URL */}
+            <h1>{props.title}</h1>
 
-            {/*{TODO: Text box for request }*/}
+            <input
+                placeholder={"Enter URL"}
+                id={"urlInput"}
+            />
 
-            {/*{TODO: Send button to send the request}*/}
+            <input
+                placeholder={"Enter Request body"}
+                id={"requestInput"}
+            />
 
-            {/*{TODO: Text Box for response}*/}
+            <button name={"Send"}>Send</button>
+
+            <textarea
+                placeholder={"Your response would be here"}
+            />
         </>
     )
 }
