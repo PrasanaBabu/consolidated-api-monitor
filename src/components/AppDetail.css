@@ -1,0 +1,50 @@
+.flex-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-items: normal;
+    align-content: stretch;
+}
+
+.flex-items:nth-child(1) {
+    display: block;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+    align-self: stretch;
+    order: 0;
+    margin: auto;
+    height: 500px;
+    width: 40%;
+}
+
+.flex-items:nth-child(2) {
+    display: block;
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+    align-self: center;
+    order: 0;
+    margin: auto;
+    height: 100px;
+    width: 20%;
+}
+
+.flex-items:nth-child(3) {
+    display: block;
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+    align-self: stretch;
+    order: 0;
+    margin: auto;
+    height: 500px;
+    width: 40%;
+}
+
+h1 {
+    font-size: 1.5em;
+    text-align: center;
+    color: #000000;
+}

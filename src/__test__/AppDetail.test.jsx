@@ -1,6 +1,8 @@
-import {render, screen} from "@testing-library/react";
+import {fireEvent, render, screen} from "@testing-library/react";
 import App from "../App";
 import AppDetail from "../components/AppDetail";
+import userEvent, {setup} from "@testing-library/user-event";
+import {act} from "react-dom/test-utils";
 
 test('renders title got from props', () => {
     render(<AppDetail title={"Test Title"} />);
@@ -30,4 +32,36 @@ test('should have output box to show response', () => {
     render(<AppDetail title={"Test Title"} />);
     const responseBoxElement = screen.getByPlaceholderText(/Your response would be here/i);
     expect(responseBoxElement).toBeInTheDocument();
+})
+
+test('after send button is clicked api call is made using the details in the input boxes', async () => {
+
+    const mockVessels = [
+        { id: 1, name: 'Ship 1' },
+    ];
+
+    jest.spyOn(global, 'fetch').mockImplementationOnce(() =>
+        Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve(mockVessels),
+        })
+    );
+
+
+
+    render(<AppDetail title={"Test Title"} />);
+
+
+    const sendButtonElement = screen.getByText(/Send/i);
+    const requestBoxElement = screen.getByPlaceholderText(/Enter Request body/i);
+    const urlElement = screen.getByPlaceholderText(/Enter URL/i);
+
+    await userEvent.type(urlElement, "localhost")
+    await userEvent.type(requestBoxElement, "t:his is the request")
+    userEvent.click(sendButtonElement);
+
+    expect(global.fetch).toHaveBeenCalled();
+
+    expect(1).toBe(2);
+
 })
