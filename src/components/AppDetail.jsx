@@ -1,5 +1,6 @@
 import {useState} from "react";
 import './AppDetail.css'
+import {fetchResponse, getToken} from "./FetchService";
 
 const AppDetail = (props) => {
 
@@ -9,19 +10,17 @@ const AppDetail = (props) => {
 
     async function handleSendRequest() {
 
-        const response = await fetch(requestUrl, {
-            headers: {
-                // 'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            method: "POST",
-            body: JSON.stringify(JSON.parse(requestBody)),
-            // mode: "no-cors",
-        }).catch();
+        // await getToken("test");
+
+        if (requestUrl.trim() === '' || requestBody.trim() === '') {
+            alert("Please enter request details")
+            return;
+        }
+        const response = fetchResponse(requestUrl, requestBody)
 
         let responseBody = await response.json();
-
-        setResponseData(JSON.stringify(responseBody, null, 4))
+        responseBody = JSON.stringify(responseBody, null, 4)
+        setResponseData(responseBody);
     }
 
     function handleRequestBodyChange(event) {
@@ -72,6 +71,7 @@ const AppDetail = (props) => {
                         placeholder={"Your response would be here"}
                         value={responseData}
                         readOnly={true}
+
                     />
                 </div>
 

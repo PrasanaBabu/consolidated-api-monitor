@@ -2,6 +2,7 @@ import {fireEvent, render, screen} from "@testing-library/react";
 import App from "../App";
 import AppDetail from "../components/AppDetail";
 import userEvent, {setup} from "@testing-library/user-event";
+import * as service from "../components/FetchService";
 import {act} from "react-dom/test-utils";
 
 test('renders title got from props', () => {
@@ -36,21 +37,19 @@ test('should have output box to show response', () => {
 
 test('after send button is clicked api call is made using the details in the input boxes', async () => {
 
-    const mockVessels = [
+    const mockData = [
         { id: 1, name: 'Ship 1' },
     ];
 
-    jest.spyOn(global, 'fetch').mockImplementationOnce(() =>
+    const mockFetch = jest.spyOn(service, 'fetchResponse')
+        .mockImplementationOnce(() =>
         Promise.resolve({
             ok: true,
-            json: () => Promise.resolve(mockVessels),
+            json: () => Promise.resolve(mockData),
         })
     );
 
-
-
     render(<AppDetail title={"Test Title"} />);
-
 
     const sendButtonElement = screen.getByText(/Send/i);
     const requestBoxElement = screen.getByPlaceholderText(/Enter Request body/i);
@@ -58,10 +57,30 @@ test('after send button is clicked api call is made using the details in the inp
 
     await userEvent.type(urlElement, "localhost")
     await userEvent.type(requestBoxElement, "t:his is the request")
+    await userEvent.click(sendButtonElement);
+
+    expect(mockFetch).toBeCalledTimes(1);
+})
+
+test('should not make api call when url or request body is not entered', async () => {
+    render(<AppDetail title={"Test Title"} />);
+    const mockData = [
+        { id: 1, name: 'Ship 1' },
+    ];
+
+    const mockFetch = jest.spyOn(service, 'fetchResponse')
+        .mockImplementationOnce(() =>
+            Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve(mockData),
+            })
+        );
+
+    const sendButtonElement = screen.getByText(/Send/i);
+    const requestBoxElement = screen.getByPlaceholderText(/Enter Request body/i);
+    const urlElement = screen.getByPlaceholderText(/Enter URL/i);
+
     userEvent.click(sendButtonElement);
 
-    expect(global.fetch).toHaveBeenCalled();
-
-    expect(1).toBe(2);
-
+    expect(mockFetch).not.toHaveBeenCalled();
 })
