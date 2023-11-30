@@ -1,22 +1,39 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import './AppDetail.css'
-import {fetchResponse, getToken} from "./FetchService";
+import {fetchResponse, getToken,} from "./FetchService";
 
+const cartPortNumber = '8080';
 const AppDetail = (props) => {
 
+    useEffect(() => {
+        console.log('insidee useeffect')
+        fetchToken();
+    }, []);
     const [requestBody, setRequestBody] = useState('');
-    const [requestUrl, setRequestUrl] = useState('');
+    const [requestUrl, setRequestUrl] = useState({hostName: '', endpoint: ''});
     const [responseData, setResponseData] = useState('')
+    const [token, setToken] = useState('');
+
+    async function fetchToken() {
+        await getToken(props.title).then((response) => {
+            setToken(response.token);
+        })
+
+        console.log("token is " + token)
+
+    }
+
+
+
 
     async function handleSendRequest() {
+        // await fetchToken();
 
-        // await getToken("test");
-
-        if (requestUrl.trim() === '' || requestBody.trim() === '') {
+        if (requestUrl.hostName.trim() === '' || requestUrl.endpoint.trim() === ''  || requestBody.trim() === '') {
             alert("Please enter request details")
             return;
         }
-        const response = fetchResponse(requestUrl, requestBody)
+        const response = await fetchResponse(requestUrl.hostName + '/' + requestUrl.endpoint, requestBody, token)
 
         let responseBody = await response.json();
         responseBody = JSON.stringify(responseBody, null, 4)
@@ -24,11 +41,32 @@ const AppDetail = (props) => {
     }
 
     function handleRequestBodyChange(event) {
-        setRequestBody(event.target.value)
+        setRequestBody((prevState) => {
+            return event.target.value;
+        })
     }
 
     function handleRequestUrlChange(event) {
-        setRequestUrl(event.target.value)
+        setRequestUrl((prevState) => {
+            if (event.target.id === 'hostInput')
+                return {...prevState, hostName: event.target.value}
+            return {...prevState, endpoint: event.target.value}
+
+        })
+    }
+
+    function handleDevBtnClick() {
+        setRequestUrl((prevState) => {
+            return {...prevState, hostName: 'https://api.d01e.gcp.ford.com'}
+        })
+        console.log(requestUrl)
+    }
+
+    function handleLocalBtnClick() {
+        setRequestUrl((prevState) => {
+            return {...prevState, hostName: 'http://localhost:' + cartPortNumber}
+        })
+        console.log(requestUrl)
     }
 
     return (
@@ -39,8 +77,8 @@ const AppDetail = (props) => {
 
                 <div style={{display: "flex", justifyContent: "center", margin: "10px 10px 10px 10px"}}>
                     <input
-                        placeholder={"Enter URL"}
-                        id={"urlInput"}
+                        placeholder={"Enter hostname"}
+                        id={"hostInput"}
                         onChange={handleRequestUrlChange}
                         style={{
                             margin: "auto",
@@ -48,7 +86,29 @@ const AppDetail = (props) => {
                             padding: "10px",
                             textAlign: "center"
                         }}
+                        value={requestUrl.hostName}
                     />
+                    <input
+                        placeholder={"Enter endpoint"}
+                        id={"endpointInput"}
+                        onChange={handleRequestUrlChange}
+                        style={{
+                            margin: "auto",
+                            width: "30%",
+                            padding: "10px",
+                            textAlign: "center"
+                        }}
+                        value={requestUrl.endpoint}
+                    />
+                    <button onClick={handleLocalBtnClick}>LOCAL</button>
+                    <button
+                        style={{
+                            padding: "10px",
+                            textAlign: "center",
+                            marginLeft : "10px"
+                        }}
+                        onClick={handleDevBtnClick}>DEV
+                    </button>
                 </div>
 
                 <div className={"flex-container"}>
@@ -63,14 +123,25 @@ const AppDetail = (props) => {
                         className={"flex-items"}
                         name={"Send"}
                         onClick={handleSendRequest}
+                        style={{
+                            padding: "10px",
+                            textAlign: "center",
+                            margin : "50px 50px 50px 50px"
+                        }}
                     > Send
                     </button>
+
 
                     <textarea
                         className={"flex-items"}
                         placeholder={"Your response would be here"}
                         value={responseData}
                         readOnly={true}
+                        style={{
+                            padding: "10px",
+                            textAlign: "center",
+                            // margin : "50px 50px 50px 50px"
+                        }}
 
                     />
                 </div>

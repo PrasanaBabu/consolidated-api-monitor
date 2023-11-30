@@ -6,7 +6,7 @@ const HomePage = () => {
         <div>
             <h1>I am the HomePage</h1>
 
-            <AppDetail title={"App 1"}/>
+            <AppDetail title={"CART"}/>
         </div>
     )
 }

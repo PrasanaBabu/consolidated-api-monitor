@@ -1,7 +1,6 @@
-import {fireEvent, render, screen} from "@testing-library/react";
-import App from "../App";
+import {render, screen} from "@testing-library/react";
 import AppDetail from "../components/AppDetail";
-import userEvent, {setup} from "@testing-library/user-event";
+import userEvent from "@testing-library/user-event";
 import * as service from "../components/FetchService";
 import {act} from "react-dom/test-utils";
 
@@ -84,3 +83,23 @@ test('should not make api call when url or request body is not entered', async (
 
     expect(mockFetch).not.toHaveBeenCalled();
 })
+
+test('should have button to set url as localhost', async () => {
+    render(<AppDetail title={"Test Title"} />);
+    const localButtonElement = screen.getByText(/LOCAL/i);
+    expect(localButtonElement).toBeInTheDocument();
+    //button should set url to http://localhost:8080
+
+    act(async () => {
+        await userEvent.click(localButtonElement);
+
+    });
+
+
+    const urlElement = screen.getByPlaceholderText('Enter Request body');
+    console.log(urlElement.value + " hello")
+
+    expect(urlElement).toBeInTheDocument();
+
+});
+
