@@ -1,0 +1,27 @@
+.card-container {
+    width: 250px;
+    border: 1rem;
+    box-shadow: 0 10px 8px #999;
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    background-color: aliceblue;
+    height: fit-content;
+    justify-content: space-evenly;
+}
+
+.card-container:hover {
+    box-shadow: 0 20px 56px brown;
+}
+
+.card-image {
+    margin: 0.5rem 5%;
+}
+
+.card-title,
+.card-description {
+    margin: 0.5rem 5%;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+}

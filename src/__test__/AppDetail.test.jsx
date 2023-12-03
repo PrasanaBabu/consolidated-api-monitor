@@ -1,5 +1,5 @@
 import {render, screen} from "@testing-library/react";
-import AppDetail from "../components/AppDetail";
+import AppDetail from "../pages/AppDetail";
 import userEvent from "@testing-library/user-event";
 import * as service from "../components/FetchService";
 import {act} from "react-dom/test-utils";

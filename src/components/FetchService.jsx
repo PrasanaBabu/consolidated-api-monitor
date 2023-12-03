@@ -1,6 +1,7 @@
 export async function fetchResponse(requestUrl, requestBody, token) {
     console.log("token is inside  " + token)
 
+
     return await fetch(requestUrl, {
         headers: {
             'Accept': 'application/json',
@@ -15,14 +16,17 @@ export async function fetchResponse(requestUrl, requestBody, token) {
 
 }
 
-export async function getToken(appName) {
+export function getToken(appName) {
     const tokenURL = 'http://localhost:8090/api/v1/token/'
 
-        return await fetch(tokenURL + 'cart', {
+        return fetch(tokenURL + 'cart', {
             headers: {
             },
         })
             .then((response) => {
-            return response.json();
+                console.log('3' + JSON.stringify(response.body))
+
+                return response.json();
         })
+
 }
