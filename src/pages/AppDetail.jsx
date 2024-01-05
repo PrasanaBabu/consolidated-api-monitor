@@ -5,10 +5,11 @@ import {appDetails} from "../config";
 import {useParams} from "react-router-dom";
 import EndpointsSelect from "../components/EndpointsSelect";
 import {cartCollection} from "../cartCollection";
+import {rtoCollection} from "../rtoCollection";
 
 const AppDetail = (props) => {
 
-    const items = cartCollection.item[0].item;
+    let items;
 
 
     // const endpoints = endpointsByApp.cart;
@@ -22,7 +23,6 @@ const AppDetail = (props) => {
     });
 
     const [requestBody, setRequestBody] = useState('');
-
 
     const [requestUrl, setRequestUrl] = useState({hostName: '', endpoint: appDetail.endpoints[0]});
     const [responseData, setResponseData] = useState('')
@@ -39,8 +39,22 @@ const AppDetail = (props) => {
 
 
     useEffect(() => {
+        if (appName=='cart'){
+            items = cartCollection.item[0].item;
+
+        }
+        else if (appName == 'rto'){
+            items = rtoCollection.item[0].item
+        }
+        //TODO: modify for other jouneys in better way
+        else {
+            items = cartCollection.item[0].item
+        }
+
         console.log('insidee useeffect')
         console.log(appDetail.endpoints.flatMap((value) => value + '/'))
+
+        console.log("items : " + JSON.stringify(items, null, 4))
         let item = items[0]
         // if (item.request.raw.contains(appDetail.endpoints[0])){
         setRequestBody(item.request.body.raw)
@@ -77,38 +91,67 @@ const AppDetail = (props) => {
     }
 
     function handleErrorScenarios(response, httpStatusCode) {
-        if (httpStatusCode === 400) {
-            handleValidationScenarios(response);
-        } else if (httpStatusCode === 500) {
-            handleBusinessErrorScenarios(response);
-        } else if (httpStatusCode === 403) {
-            handleAuthenticationScenarios(response);
-        }
-    }
-
-    function handleValidationScenarios(response) {
         // let responseBody = await response.json();
-
         const responseMessage =  JSON.stringify(response, null, 4)
         console.log("res body in error = "+responseMessage)
         setResponseData(responseMessage);
+        if (httpStatusCode === 400) {
+            handleValidationScenarios(responseMessage);
+        } else if (httpStatusCode === 500) {
+            handleBusinessErrorScenarios(responseMessage);
+        } else if (httpStatusCode === 403) {
+            handleAuthenticationScenarios(responseMessage);
+        }
+    }
+
+    function handleValidationScenarios(responseMessage) {
+
         if (responseMessage.includes("GFC100")) {
             console.log("validation error")
             setErrorHelper(
                 {
                     status: true,
-                    message: "Please recheck the fields in the request body : " + response.validations[0].field
+                    message: "Please recheck the fields in the request body : " + JSON.parse(responseMessage).validations[0].field
                 }
             )
         }
     }
 
-    function handleAuthenticationScenarios() {
-
+    function handleAuthenticationScenarios(responseMessage) {
+        console.log("token invalid")
+        setErrorHelper(
+            {
+                status: true,
+                message: "Token has expired / invalid. please reload the page or click button to generate token "
+            }
+        )
     }
 
-    function handleBusinessErrorScenarios() {
+    function handleBusinessErrorScenarios(responseMessage) {
+        if(responseMessage.includes("GFC101")){
+            console.log("rvst error lease")
+            setErrorHelper(
+                {
+                    status: true,
+                    message: "Please recheck the VIN , RVST Error has occurred  "
+                }
+            )
+        }
+    }
 
+    function resetError() {
+        setError({
+            status: false,
+            message: "working"
+
+        })
+    }
+    function resetErrorHelper() {
+        setErrorHelper({
+            status: false,
+            message: ""
+
+        })
     }
 
     async function handleSendRequest() {
@@ -116,13 +159,22 @@ const AppDetail = (props) => {
         console.log(flat)
         // await fetchToken();
 
+        resetErrorHelper();
+
         if (requestUrl.hostName.trim() === '' || requestUrl.endpoint.trim() === '' || requestBody.trim() === '') {
             alert("Please enter request details")
             return;
         }
+        let reqBodyToSend;
 
         // TODO: this will produce error when proper json format is not given handle it.
-        let reqBodyToSend = JSON.stringify(JSON.parse(requestBody))
+        try{
+
+        reqBodyToSend = JSON.stringify(JSON.parse(requestBody));
+        resetError();
+        } catch (err){
+            setError({status: true, message: "please input correct request body in json format"})
+        }
         // setRequestBody(JSON.stringify(JSON.parse(requestBody)));
 
         try {
@@ -139,11 +191,7 @@ const AppDetail = (props) => {
                 let responseBody = await response.json();
                 console.log('response body = ' + JSON.stringify(responseBody))
 
-                setError({
-                    status: false,
-                    message: "working"
-
-                })
+                resetError();
 
                 responseBody = JSON.stringify(responseBody, null, 4)
                 setResponseData(responseBody);
