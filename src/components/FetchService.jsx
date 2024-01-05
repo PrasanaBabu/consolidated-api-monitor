@@ -4,15 +4,18 @@ export async function fetchResponse(requestUrl, requestBody, token) {
 
     return await fetch(requestUrl, {
         headers: {
-            'Accept': 'application/json',
+            // 'Accept': 'application/json',
             'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token
+            Authorization: 'Bearer ' + token,
+            // 'Origin': 'http://localhost:3000/'
         },
         method: "POST",
-        body: JSON.stringify(JSON.parse(requestBody)),
+        body: requestBody,
         // mode: "no-cors",
     })
-        .catch()
+        .catch(err=>{
+            console.log(err)
+        })
 
 }
 
